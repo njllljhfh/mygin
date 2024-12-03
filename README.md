@@ -18,4 +18,11 @@ air init
 
 # After this, you can just run the air command without additional arguments, and it will use the .air.toml file for configuration.
 air
+
+
+# mac下，热启动服务并设置端口，命令行执行: 
+PORT=8086 air
+# windows下 
+$env:PORT="8086"
+air
 ```
