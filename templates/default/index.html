@@ -1,0 +1,101 @@
+{{ define "default/index.html" }}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>index</title>
+    <!--要在 main.go 中配置静态web目录后，才能访问-->
+    <!--建议加上 "/", "/" 表示项目根目录-->
+    <link rel="stylesheet" href="/static/css/base.css">
+</head>
+
+<body>
+<!--模板嵌套：嵌入其他模板-->
+<!--当前模板中的变量 如 .title，在下面的嵌套模板中也可以访问-->
+<!--当前模板中的 css 样式，在下面的嵌套模板中也会生效-->
+<!--注意 最后的 . 别忘了，否则无法把当前模板中的属性传递给 嵌套的模板-->
+{{ template "public/page_header.html" . }}
+
+<!------------------------------------------------------->
+<h2>{{.title}}</h2>
+<hr>
+
+<!--定义变量：将 title 赋值给变量 t-->
+{{$t := .title}}
+<h4>{{$t}}</h4>
+<hr>
+
+<!--条件判断-->
+<!--score >= 90-->
+{{ if ge .score 90 }}
+<p>优秀</p>
+{{else if ge .score 80 }}
+<p>良好</p>
+{{else if ge .score 60 }}
+<p>及格</p>
+{{else}}
+<p>不及格</p>
+{{end}}
+<hr>
+
+<!--循环遍历数据-->
+<ul>
+    {{range $key,$value := .hobby}}
+    <li>{{$key}} --- {{$value}}</li>
+    {{end}}
+</ul>
+<hr>
+
+<ul>
+    {{range $key,$value := .newsList}}
+    <li>{{$key}} --- {{$value.Title}} --- {{$value.Content}}</li>
+    {{end}}
+</ul>
+<hr>
+
+<ul>
+    {{range $key,$value := .testSlice}}
+    <li>{{$key}} --- {{$value.Title}}</li>
+    {{else}}
+    <li>testSlice 切片中没有数据</li>
+    {{end}}
+</ul>
+<hr>
+
+<!--with 解构结构体-->
+{{with .news}}
+<p>{{.Title}}</p>
+<p>{{.Content}}</p>
+{{end}}
+<hr>
+<!------------------------------------------------------->
+
+<!--内置模板函数(预定义函数)-->
+<!--获取字符串长度-->
+title 的长度：{{len .title}}
+<hr>
+<!------------------------------------------------------->
+
+<!--自定义模板函数-->
+<p>时间戳：{{.data}}</p>
+<p>日期：{{UnixToTime .data}}</p>
+<hr>
+
+<p>{{MyPrintln .title .msg}}</p>
+<hr>
+<!------------------------------------------------------->
+
+<!--加载图片-->
+<!--要在 main.go 中配置静态web目录后，才能访问-->
+<img src="/static/images/node.png" style="width: 200px; height: 200px" alt="#">
+<hr>
+<!------------------------------------------------------->
+
+<!--模板嵌套：嵌入其他模板-->
+{{ template "public/page_footer.html" . }}
+
+</body>
+
+</html>
+{{ end }}

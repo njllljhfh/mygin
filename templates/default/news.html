@@ -1,0 +1,28 @@
+<!--给模板定义一个名字 define 和 end 成对出现-->
+{{ define "default/news.html" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>News</title>
+    <!--  要在 main.go 中配置静态web目录后，才能访问  -->
+    <link rel="stylesheet" href="static/css/base.css">
+</head>
+<body>
+<!--模板嵌套：嵌入其他模板-->
+{{ template "public/page_header.html" . }}
+
+<!------------------------------------------------------->
+
+<h2>{{.title}}</h2>
+<p>{{.news.Title}} </p>
+<p>{{.news.Desc}} </p>
+<p>{{.news.Content}} </p>
+<hr>
+<!------------------------------------------------------->
+
+{{ template "public/page_footer.html" . }}
+</body>
+</html>
+{{ end }}
