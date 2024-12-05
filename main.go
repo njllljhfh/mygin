@@ -1,9 +1,11 @@
 package main
 
 import (
+    "encoding/xml"
     "fmt"
     "github.com/gin-gonic/gin"
     "html/template"
+    "mygin/routers"
     "net/http"
     "os"
     "time"
@@ -13,6 +15,17 @@ type Article struct {
     Title   string `json:"title"` // 让返回给web的json的key首字母小写
     Desc    string `json:"desc"`
     Content string `json:"content"`
+}
+
+type UserInfo struct {
+    Username string `json:"username" form:"username"` // form:"username" 对应web传过来的key
+    Password string `json:"password" form:"password"`
+}
+
+// Article2 解析xml数据到结构体
+type Article2 struct {
+    Title   string `json:"title" xml:"title"`
+    Content string `json:"content" xml:"content"`
 }
 
 // UnixToTime 时间戳转换成日期字符串
@@ -46,54 +59,99 @@ func main() {
     // 参数2：映射的目录
     r.Static("/static", "./static")
 
-    r.GET("/", func(c *gin.Context) {
-        c.HTML(http.StatusOK, "default/index.html", gin.H{
-            "title": "首页",
-            "msg":   "我是msg",
-            "score": 89,
-            "hobby": []string{"吃饭", "睡觉", "写代码"},
-            "newsList": []interface{}{
-                &Article{
-                    Title:   "新闻-标题111",
-                    Desc:    "新闻-描述111",
-                    Content: "新闻-详情111",
-                },
-                &Article{
-                    Title:   "新闻-标题222",
-                    Desc:    "新闻-描述222",
-                    Content: "新闻-详情222",
-                },
-            },
-            "testSlice": []string{},
-            "news": &Article{
-                Title:   "新闻标题",
-                Content: "新闻内容",
-            },
-            "data": 1733304926, // 时间戳
+    //
+    routers.AdminRouterInit(r)
+    routers.ApiRouterInit(r)
+    routers.DefaultRouterInit(r)
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    /*
+       获取请求中传递的参数
+    */
+
+    // get请求传值
+    r.GET("/getTest", func(c *gin.Context) {
+        username := c.Query("username")
+        age := c.Query("age")
+        // 如果没有page，设置默认值为 "1"
+        page := c.DefaultQuery("page", "1")
+        c.JSON(http.StatusOK, gin.H{
+            "username": username,
+            "age":      age,
+            "page":     page,
         })
     })
 
-    r.GET("/news", func(c *gin.Context) {
-        news := &Article{
-            Title:   "新闻-标题",
-            Desc:    "新闻-描述",
-            Content: "新闻-详情",
+    r.GET("/user", func(c *gin.Context) {
+        c.HTML(http.StatusOK, "default/user.html", gin.H{})
+    })
+    // post请求传值
+    r.POST("/doAddUser", func(c *gin.Context) {
+        // 获取表单post请求传递的数据
+        username := c.PostForm("username")
+        password := c.PostForm("password")
+        c.JSON(http.StatusOK, gin.H{
+            "username": username,
+            "password": password,
+        })
+    })
+
+    // 把web传递过来的数据绑定到结构体上
+    // http://localhost:8086/getUser?username=zhangsan&password=123
+    r.GET("/getUser", func(c *gin.Context) {
+        user := &UserInfo{}
+        // 绑定web传来的数据到结构体
+        if err := c.ShouldBind(user); err == nil {
+            fmt.Printf("用户结构体信息：%#v\n", user)
+            c.JSON(http.StatusOK, user)
+        } else {
+            c.JSON(http.StatusOK, gin.H{
+                "err": err,
+            })
         }
-        // 返回html模板
-        c.HTML(http.StatusOK, "default/news.html", gin.H{
-            "title": "新闻页面",
-            "news":  news,
-        })
     })
 
-    r.GET("/admin", func(c *gin.Context) {
-        c.HTML(http.StatusOK, "admin/index.html", gin.H{})
+    r.POST("/doAddUser2", func(c *gin.Context) {
+        user := &UserInfo{}
+        // 绑定web传来的数据到结构体
+        if err := c.ShouldBind(user); err == nil {
+            fmt.Printf("用户结构体信息：%#v\n", user)
+            c.JSON(http.StatusOK, user)
+        } else {
+            c.JSON(http.StatusOK, gin.H{
+                "err": err,
+            })
+        }
     })
 
-    r.GET("/admin/news", func(c *gin.Context) {
-        // name参数是 html中define定义的名字
-        c.HTML(http.StatusOK, "adminNews", gin.H{})
+    // 获取 Post xml 数据
+    // 在对接 第三方提供的支付相关功能时，可能返回的是xml数据
+    r.POST("/xml", func(c *gin.Context) {
+        article := &Article2{}
+        xmlSliceData, _ := c.GetRawData() //  从 c.Request.Body 读取请求数据
+        // fmt.Println("xmlSliceData", xmlSliceData)  // []byte
+        // 将xml数据绑定到结构体
+        if err := xml.Unmarshal(xmlSliceData, article); err == nil {
+            c.JSON(http.StatusOK, article)
+        } else {
+            c.JSON(http.StatusBadRequest, gin.H{
+                "err": err,
+            })
+        }
     })
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    /*
+       动态路由，从路由中获取参数
+    */
+    // list/123
+    // cid=123
+    r.GET("/list/:cid", func(c *gin.Context) {
+        cid := c.Param("cid")
+        fmt.Printf("cid=%s\n", cid)
+        c.String(http.StatusOK, "cid: %s", cid)
+    })
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     // get请求
@@ -158,6 +216,13 @@ func main() {
     r.DELETE("/delete", func(c *gin.Context) {
         c.String(http.StatusOK, "我是delete返回的数据-%d", 777)
     })
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    /*
+       路由分组, 见 /routers 目录
+    */
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     // 启动HTTP服务 默认在 0.0.0.0:8080 上启动服务
     // r.Run(":8686") // 设置端口为 8686

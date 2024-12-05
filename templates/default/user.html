@@ -1,0 +1,21 @@
+<!--给模板定义一个名字 define 和 end 成对出现-->
+{{ define "default/user.html" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>User</title>
+    <!--  要在 main.go 中配置静态web目录后，才能访问  -->
+    <link rel="stylesheet" href="/static/css/base.css">
+</head>
+<body>
+<!--<form action="/doAddUser" method="post">-->
+<form action="/doAddUser2" method="post">
+    用户名：<input type="text" name="username"><br>
+    密码：<input type="password" name="password"><br>
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>
+{{ end }}

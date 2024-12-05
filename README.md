@@ -3,6 +3,9 @@
 学习gin
 
 ```shell
+# 初始化go.mod
+go mod init mygin  
+ 
 # 下载并安装 gin
 go get -u github.com/gin-gonic/gin
 ```
