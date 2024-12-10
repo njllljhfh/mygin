@@ -1,0 +1,24 @@
+{{ define "admin/userAdd2.html" }}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>单文件上传</title>
+</head>
+
+<body>
+<h2>单文件上传</h2>
+<form action="/admin/user/upload" method="post" enctype="multipart/form-data">
+    <!--表单传文件，要加上 enctype="multipart/form-data"-->
+    用户名：<input type="text" name="username" placeholder="用户名">
+    <br>
+    <br>
+    头像：<input type="file" name="face">
+    <br>
+    <br>
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>
+{{end}}

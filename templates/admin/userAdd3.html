@@ -1,0 +1,29 @@
+{{ define "admin/userAdd3.html" }}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>多文件上传</title>
+</head>
+
+<body>
+<h2>多文件上传</h2>
+<form action="/admin/user/multiUpload" method="post" enctype="multipart/form-data">
+    <label for="username">用户名：</label>
+    <input type="text" id="username" name="username" placeholder="用户名">
+    <br>
+    <br>
+    <label for="file1">文件1：</label>
+    <input type="file" id="file1" name="face[]">
+    <br>
+    <br>
+    <label for="file2">文件2：</label>
+    <input type="file" id="file2" name="face[]">
+    <br>
+    <br>
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>
+{{end}}

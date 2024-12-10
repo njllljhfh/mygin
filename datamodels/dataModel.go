@@ -1,4 +1,4 @@
-package dataModel
+package datamodels
 
 type UserInfo struct {
     Name   string `json:"name"`

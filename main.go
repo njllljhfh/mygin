@@ -4,13 +4,15 @@ import (
     "encoding/xml"
     "fmt"
     "github.com/gin-gonic/gin"
+    "github.com/sirupsen/logrus"
     "html/template"
     "mygin/controllers/itying"
+    "mygin/logconfig"
     MDW "mygin/middlewares"
+    "mygin/models"
     "mygin/routers"
     "net/http"
     "os"
-    "time"
 )
 
 type UserInfo struct {
@@ -24,26 +26,43 @@ type Article2 struct {
     Content string `json:"content" xml:"content"`
 }
 
-// UnixToTime 时间戳转换成日期字符串
-func UnixToTime(timestamp int) string {
-    fmt.Printf("时间戳为：%v\n", timestamp)
-    t := time.Unix(int64(timestamp), 0)
-    return t.Format("2006-01-02 15:04:05")
-}
-
 func MyPrintln(str1 string, str2 string) string {
     fmt.Println(str1, str2)
     return str1 + "---" + str2
 }
 
+type CustomFormatter struct{}
+
+func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+    // 获取当前时间，格式为 yyyy-MM-dd HH:mm:ss,SSS
+    timestamp := entry.Time.Format("2006-01-02 15:04:05,000")
+
+    // 自定义日志格式
+    log := fmt.Sprintf("[%s][%s][m:%s][l:%d] %s\n",
+        entry.Level.String(), // 日志级别
+        timestamp,            // 时间戳
+        entry.Data["module"], // 自定义字段 module
+        entry.Data["line"],   // 自定义字段 line
+        entry.Message,        // 日志消息
+    )
+
+    return []byte(log), nil
+}
+
 func main() {
     // 创建一个默认的路由引擎
     // 知识：gin.Default() 默认添加 Logger() 和 Recovery() 中间件
-    r := gin.Default()
+    // r := gin.Default()
+
+    // 使用 logrus 日志
+    logger := logconfig.InitLogger()
+    r := gin.New()
+    r.Use(gin.Logger(), gin.Recovery())
+    logger.Infof("main 函数 ---------")
 
     // 注册自定义的模板函数(注意，注册函数要放在加载模板文件路径之前)
     r.SetFuncMap(template.FuncMap{
-        "UnixToTime": UnixToTime,
+        "UnixToTime": models.UnixToTime,
         "MyPrintln":  MyPrintln,
     })
 
