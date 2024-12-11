@@ -25,7 +25,7 @@ func InitMiddlewareOne(c *gin.Context) {
     logger.Infof("接口级-中间件1 --- end")
     end := time.Now().UnixNano()
     // fmt.Printf("耗时：%v 纳秒\n", end-start)
-    logger.Infof("耗时：%v 纳秒\n", end-start)
+    logger.Infof("耗时：%v 纳秒", end-start)
 }
 
 func InitMiddlewareTwo(c *gin.Context) {

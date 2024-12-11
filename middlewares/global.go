@@ -10,6 +10,7 @@ func GlobalMiddlewareOne(c *gin.Context) {
     c.Next()
     // fmt.Printf("全局-中间件1 --- end\n")
     logger.Infof("全局-中间件1 --- end")
+    logger.Infof("")
 }
 
 func GlobalMiddlewareTwo(c *gin.Context) {

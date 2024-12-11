@@ -4,6 +4,7 @@ import (
     "fmt"
     "github.com/sirupsen/logrus"
     "io"
+    "mygin/settings"
     "os"
     "path/filepath"
     "runtime"
@@ -13,18 +14,6 @@ import (
 /*
    日志配置（待完善）
 */
-
-// 项目根目录
-var baseDir string
-
-func init() {
-    // 获取项目根目录
-    wd, err := os.Getwd()
-    if err != nil {
-        panic(err)
-    }
-    baseDir = wd
-}
 
 // CustomFormatter 自定义日志格式
 type CustomFormatter struct{}
@@ -76,7 +65,7 @@ func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 // getModulePath 解析文件路径为模块路径
 func getModulePath(filePath string) string {
     // 获取相对路径
-    relativePath, err := filepath.Rel(baseDir, filePath)
+    relativePath, err := filepath.Rel(settings.BaseDir, filePath)
     if err != nil {
         return filePath
     }
@@ -125,7 +114,7 @@ func InitLogger() *logrus.Logger {
 
 // func main() {
 //     // 初始化 logger
-//     logger := initLogger()
+//     logger := InitLogger()
 //
 //     fmt.Println("Project Path:", baseDir)
 //
